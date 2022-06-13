@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Queue Control Panel</title>
+<script>
+
+async function loadQueue() {
+    const result = await fetch('/api/queue?all=1', { encoding: "utf-8" })
+    const current = document.getElementById('current')
+    current.innerText = await result.text()
+}
+
+async function addItem() {
+    const item = document.getElementById('item')
+    await Promise.all(item.value.split("\n").map(line => fetch('/api/queue', {
+        method: 'POST',
+        body: line
+    })))
+    await loadQueue()
+}
+
+window.onload = loadQueue
+let queueInterval = setInterval(loadQueue, 2000)
+
+</script>
+</head>
+<body>
+
+<h1>Qurrent Queue</h1>
+<div id="current"></div>
+
+<h1>Add Item</h1>
+<div>
+    <textarea type="text" id="item" rows="10" cols="50"></textarea>
+    <br />
+    <button onclick="addItem()">Add</button>
+    <div id="status"></div>
+</div>
+
+</body>
+</html>
